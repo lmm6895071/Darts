@@ -16,7 +16,8 @@ import torch.backends.cudnn as cudnn
 from torch.autograd import Variable
 from model_search import Network
 from architect import Architect
- 
+from weights_update import Weights_Update
+
 parser = argparse.ArgumentParser("cifar")
 parser.add_argument('--data', type=str, default='../data', help='location of the data corpus')
 parser.add_argument('--batch_size', type=int, default=64, help='batch size')
@@ -76,11 +77,17 @@ def main():
   model = model.cuda()
   logging.info("param size = %fMB", utils.count_parameters_in_MB(model))
 
-  optimizer = torch.optim.SGD(
-      model.parameters(),
-      args.learning_rate,
+  # optimizer = torch.optim.SGD(
+  #     model.parameters(),
+  #     args.learning_rate,
+  #     momentum=args.momentum,
+  #     weight_decay=args.weight_decay)
+
+  optimizer_alpha = torch.optim.SGD(
+      self.model.arch_parameters(),
+      args.arch_learning_rate, 
       momentum=args.momentum,
-      weight_decay=args.weight_decay)
+      weight_decay=args.arch_weight_decay)
 
   train_transform, valid_transform = utils._data_transforms_cifar10(args)
   train_data = dset.CIFAR10(root=args.data, train=True, download=True, transform=train_transform)
@@ -117,7 +124,7 @@ def main():
     print(F.softmax(model.alphas_reduce, dim=-1))
 
     # training
-    train_acc, train_obj = train(train_queue, valid_queue, model, architect, criterion, optimizer, lr)
+    train_acc, train_obj = train(train_queue, valid_queue, model, architect, criterion, optimizer_alpha, lr,weightsupdate)
     logging.info('train_acc %f', train_acc)
 
     # validation
@@ -127,7 +134,7 @@ def main():
     utils.save(model, os.path.join(args.save, 'weights.pt'))
 
 
-def train(train_queue, valid_queue, model, architect, criterion, optimizer, lr):
+def train(train_queue, valid_queue, model, architect, criterion, optimizer, lr,weightsupdate):
   objs = utils.AvgrageMeter()
   top1 = utils.AvgrageMeter()
   top5 = utils.AvgrageMeter()
@@ -144,7 +151,7 @@ def train(train_queue, valid_queue, model, architect, criterion, optimizer, lr):
     input_search = Variable(input_search, requires_grad=False).cuda()
     target_search = Variable(target_search, requires_grad=False).cuda(async=True)
 
-    architect.step(input, target, input_search, target_search, lr, optimizer, unrolled=args.unrolled)
+    weightsupdate.step(input, target, input_search, target_search, lr, optimizer_alpha, unrolled=args.unrolled)
 
     optimizer.zero_grad()
     logits = model(input)
