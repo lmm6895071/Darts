@@ -153,13 +153,11 @@ def train(train_queue, valid_queue, model, architect, criterion, optimizer, lr,w
 
     weightsupdate.step(input, target, input_search, target_search, lr, optimizer_alpha, unrolled=args.unrolled)
 
-    optimizer.zero_grad()
+    optimizer_alpha.zero_grad()
     logits = model(input)
     loss = criterion(logits, target)
-
     loss.backward()
-    nn.utils.clip_grad_norm(model.parameters(), args.grad_clip)
-    optimizer.step()
+    optimizer_alpha.step()
 
     prec1, prec5 = utils.accuracy(logits, target, topk=(1, 5))
     objs.update(loss.data[0], n)

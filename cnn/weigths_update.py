@@ -34,6 +34,7 @@ class Weights_Update(object):
         self._backward_step_unrolled(input_train, target_train, input_valid, target_valid, eta, arch_optimizer)
     else:
         self._backward_step(input_valid, target_valid)
+    nn.utils.clip_grad_norm(model.parameters(), args.grad_clip)
     self.optimizer.step()
 
   def _backward_step(self, input_valid, target_valid):
