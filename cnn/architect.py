@@ -42,17 +42,21 @@ class Architect(object):
 
   def _backward_step_unrolled(self, input_train, target_train, input_valid, target_valid, eta, network_optimizer):
     unrolled_model = self._compute_unrolled_model(input_train, target_train, eta, network_optimizer)
-    unrolled_loss = unrolled_model._loss(input_valid, target_valid)
+    # weight' = weight - eta* Dalpha_{train}
 
+    unrolled_loss = unrolled_model._loss(input_valid, target_valid)
     unrolled_loss.backward()
-    # compute the dalpha L_val(alpha)
+    # compute the dalpha L_val(weight') via validation data
+
+    # obtain the first term of eq7, i.e., Dalpha_{alpha}(Validation)
     dalpha = [v.grad for v in unrolled_model.arch_parameters()] 
-    #### obtain the new weights'
-    vector = [v.grad.data for v in unrolled_model.parameters()]
+    # obtain the gradient of new weight', i.e., Dalpha_{weight'}{}validation
+    vector = [v.grad.data for v in unrolled_model.parameters()] 
+
     implicit_grads = self._hessian_vector_product(vector, input_train, target_train)
 
     for g, ig in zip(dalpha, implicit_grads):
-      g.data.sub_(eta, ig.data)
+      g.data.sub_(eta, ig.data) #first term - second term
 
     for v, g in zip(self.model.arch_parameters(), dalpha):
       if v.grad is None:
