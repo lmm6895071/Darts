@@ -75,9 +75,9 @@ def main():
     logging.info("cpu")
 
   criterion = nn.CrossEntropyLoss()
-  criterion = criterion.cpu()
+  criterion = criterion.cuda()
   model = Network(args.init_channels, CIFAR_CLASSES, args.layers, criterion)
-  model = model.cpu()
+  model = model.cuda()
   logging.info("param size = %fMB", utils.count_parameters_in_MB(model))
 
   # optimizer = torch.optim.SGD(
@@ -146,13 +146,13 @@ def train(train_queue, valid_queue, model, architect, criterion, optimizer, lr,w
     model.train()
     n = input.size(0)
 
-    input = Variable(input, requires_grad=False).cpu()
-    target = Variable(target, requires_grad=False).cpu()#(async=True)
+    input = Variable(input, requires_grad=False).cuda()
+    target = Variable(target, requires_grad=False).cuda(async=True)
 
     # get a random minibatch from the search queue with replacement
     input_search, target_search = next(iter(valid_queue))
-    input_search = Variable(input_search, requires_grad=False).cpu()
-    target_search = Variable(target_search, requires_grad=False).cpu()#cuda(async=True)
+    input_search = Variable(input_search, requires_grad=False).cuda()
+    target_search = Variable(target_search, requires_grad=False).cuda(async=True)
 
     weightsupdate.step(input, target, input_search, target_search, lr, optimizer_alpha, unrolled=args.unrolled)
     optimizer_alpha.zero_grad()
@@ -171,7 +171,6 @@ def train(train_queue, valid_queue, model, architect, criterion, optimizer, lr,w
 
   return top1.avg, objs.avg
 
-
 def infer(valid_queue, model, criterion):
   objs = utils.AvgrageMeter()
   top1 = utils.AvgrageMeter()
@@ -179,12 +178,11 @@ def infer(valid_queue, model, criterion):
   model.eval()
 
   for step, (input, target) in enumerate(valid_queue):
-    input = Variable(input, volatile=True).cpu()#cuda()
-    target = Variable(target, volatile=True).cpu()#cuda(async=True)
+    input = Variable(input, volatile=True).cuda()
+    target = Variable(target, volatile=True).cuda(async=True)
 
     logits = model(input)
     loss = criterion(logits, target)
-
     prec1,prec5 = utils.accuracy(logits, target, topk=(1, 5))
     n = input.size(0)
     objs.update(loss.data[0], n)
