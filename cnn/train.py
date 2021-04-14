@@ -50,7 +50,7 @@ logging.getLogger().addHandler(fh)
 
 CIFAR_CLASSES = 10
 
-DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+DEVICE ="cpu"# torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 def main():
   if not torch.cuda.is_available():
