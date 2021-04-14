@@ -155,7 +155,6 @@ def train(train_queue, valid_queue, model, architect, criterion, optimizer, lr):
     loss.backward()
     nn.utils.clip_grad_norm(model.parameters(), args.grad_clip)
     optimizer.step()
-
     prec1, prec5 = utils.accuracy(logits, target, topk=(1, 5))
     objs.update(loss.data[0], n)
     top1.update(prec1.data[0], n)
