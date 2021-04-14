@@ -155,7 +155,6 @@ def train(train_queue, valid_queue, model, architect, criterion, optimizer, lr,w
     target_search = Variable(target_search, requires_grad=False).cpu()#cuda(async=True)
 
     weightsupdate.step(input, target, input_search, target_search, lr, optimizer_alpha, unrolled=args.unrolled)
-
     optimizer_alpha.zero_grad()
     logits = model(input)
     loss = criterion(logits, target)
