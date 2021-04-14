@@ -71,12 +71,12 @@ def main():
   
   genotype = eval("genotypes.%s" % args.arch)
   model = Network(args.init_channels, CIFAR_CLASSES, args.layers, args.auxiliary, genotype)
-  model = model.to(DEVICE)
+  model = model.cpu()
 
   logging.info("param size = %fMB", utils.count_parameters_in_MB(model))
 
   criterion = nn.CrossEntropyLoss()
-  criterion = criterion.to(DEVICE)
+  criterion = criterion.cpu()
   optimizer = torch.optim.SGD(
       model.parameters(),
       args.learning_rate,
@@ -117,8 +117,8 @@ def train(train_queue, model, criterion, optimizer):
   model.train()
 
   for step, (input, target) in enumerate(train_queue):
-    input = Variable(input).to(DEVICE)
-    target = Variable(target).to(DEVICE)#cuda(async=True)
+    input = Variable(input).cpu()
+    target = Variable(target).cpu()#cuda(async=True)
 
     optimizer.zero_grad()
     logits, logits_aux = model(input)
@@ -149,8 +149,8 @@ def infer(valid_queue, model, criterion):
   model.eval()
 
   for step, (input, target) in enumerate(valid_queue):
-    input = Variable(input, volatile=True).to(DEVICE)
-    target = Variable(target, volatile=True).cuda(async=True)
+    input = Variable(input, volatile=True).cpu()
+    target = Variable(target, volatile=True).cpu()#cuda(async=True)
 
     logits, _ = model(input)
     loss = criterion(logits, target)
