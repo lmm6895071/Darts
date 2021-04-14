@@ -59,21 +59,23 @@ CIFAR_CLASSES = 10
 def main():
   if not torch.cuda.is_available():
     logging.info('no gpu device available')
-    sys.exit(1)
+    # sys.exit(1)
 
   np.random.seed(args.seed)
-  torch.cuda.set_device(args.gpu)
-  cudnn.benchmark = True
   torch.manual_seed(args.seed)
-  cudnn.enabled=True
-  torch.cuda.manual_seed(args.seed)
-  logging.info('gpu device = %d' % args.gpu)
-  logging.info("args = %s", args)
-
+  try:
+    torch.cuda.set_device(args.gpu)
+    cudnn.benchmark = True
+    cudnn.enabled=True
+    torch.cuda.manual_seed(args.seed)
+    logging.info('gpu device = %d' % args.gpu)
+    logging.info("args = %s", args)
+  except Exception as e:
+    print("no gpu, only cpu")
   criterion = nn.CrossEntropyLoss()
-  criterion = criterion.cuda()
+  criterion = criterion.cpu()
   model = Network(args.init_channels, CIFAR_CLASSES, args.layers, criterion)
-  model = model.cuda()
+  model = model.cpu()
   logging.info("param size = %fMB", utils.count_parameters_in_MB(model))
 
   optimizer = torch.optim.SGD(
@@ -136,13 +138,13 @@ def train(train_queue, valid_queue, model, architect, criterion, optimizer, lr):
     model.train()
     n = input.size(0)
 
-    input = Variable(input, requires_grad=False).cuda()
-    target = Variable(target, requires_grad=False).cuda(async=True)
+    input = Variable(input, requires_grad=False).cpu()
+    target = Variable(target, requires_grad=False).cpu()#(async=True)
 
     # get a random minibatch from the search queue with replacement
     input_search, target_search = next(iter(valid_queue))
-    input_search = Variable(input_search, requires_grad=False).cuda()
-    target_search = Variable(target_search, requires_grad=False).cuda(async=True)
+    input_search = Variable(input_search, requires_grad=False).cpu()#()
+    target_search = Variable(target_search, requires_grad=False).cpu()#(async=True)
 
     architect.step(input, target, input_search, target_search, lr, optimizer, unrolled=args.unrolled)
 
@@ -172,8 +174,8 @@ def infer(valid_queue, model, criterion):
   model.eval()
 
   for step, (input, target) in enumerate(valid_queue):
-    input = Variable(input, volatile=True).cuda()
-    target = Variable(target, volatile=True).cuda(async=True)
+    input = Variable(input, volatile=True).cpu()
+    target = Variable(target, volatile=True).cpu()#(async=True)
 
     logits = model(input)
     loss = criterion(logits, target)
