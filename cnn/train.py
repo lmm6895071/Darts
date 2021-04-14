@@ -50,6 +50,7 @@ logging.getLogger().addHandler(fh)
 
 CIFAR_CLASSES = 10
 
+DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 def main():
   if not torch.cuda.is_available():
@@ -57,22 +58,25 @@ def main():
     sys.exit(1)
 
   np.random.seed(args.seed)
-  torch.cuda.set_device(args.gpu)
-  cudnn.benchmark = True
   torch.manual_seed(args.seed)
-  cudnn.enabled=True
-  torch.cuda.manual_seed(args.seed)
-  logging.info('gpu device = %d' % args.gpu)
-  logging.info("args = %s", args)
-
+  try:
+    torch.cuda.set_device(args.gpu)
+    cudnn.benchmark = True
+    cudnn.enabled=True
+    torch.cuda.manual_seed(args.seed)
+    logging.info('gpu device = %d' % args.gpu)
+    logging.info("args = %s", args)
+  except Exception as e:
+    logging.info("cpu")
+  
   genotype = eval("genotypes.%s" % args.arch)
   model = Network(args.init_channels, CIFAR_CLASSES, args.layers, args.auxiliary, genotype)
-  model = model.cuda()
+  model = model.to(DEVICE)
 
   logging.info("param size = %fMB", utils.count_parameters_in_MB(model))
 
   criterion = nn.CrossEntropyLoss()
-  criterion = criterion.cuda()
+  criterion = criterion.to(DEVICE)
   optimizer = torch.optim.SGD(
       model.parameters(),
       args.learning_rate,
@@ -113,8 +117,8 @@ def train(train_queue, model, criterion, optimizer):
   model.train()
 
   for step, (input, target) in enumerate(train_queue):
-    input = Variable(input).cuda()
-    target = Variable(target).cuda(async=True)
+    input = Variable(input).to(DEVICE)
+    target = Variable(target).to(DEVICE)#cuda(async=True)
 
     optimizer.zero_grad()
     logits, logits_aux = model(input)
@@ -145,7 +149,7 @@ def infer(valid_queue, model, criterion):
   model.eval()
 
   for step, (input, target) in enumerate(valid_queue):
-    input = Variable(input, volatile=True).cuda()
+    input = Variable(input, volatile=True).to(DEVICE)
     target = Variable(target, volatile=True).cuda(async=True)
 
     logits, _ = model(input)
