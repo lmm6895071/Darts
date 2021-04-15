@@ -1,0 +1,14 @@
+salloc: Pending job allocation 67956
+salloc: job 67956 queued and waiting for resources
+salloc: job 67956 has been allocated resources
+salloc: Granted job allocation 67956
+salloc: Waiting for resource configuration
+salloc: Nodes gpu-11-71-1-145 are ready for job
+salloc: Relinquishing job allocation 67956
+salloc: Pending job allocation 67958
+salloc: job 67958 queued and waiting for resources
+salloc: job 67958 has been allocated resources
+salloc: Granted job allocation 67958
+salloc: Waiting for resource configuration
+salloc: Nodes gpu-11-71-1-141 are ready for job
+salloc: Relinquishing job allocation 67958

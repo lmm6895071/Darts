@@ -1,0 +1,18 @@
+salloc: Pending job allocation 67934
+salloc: job 67934 queued and waiting for resources
+salloc: job 67934 has been allocated resources
+salloc: Granted job allocation 67934
+salloc: Waiting for resource configuration
+salloc: Nodes gpu-11-71-1-138 are ready for job
+Experiment dir : search-EXP-20210415-094526
+04/15 09:45:26 AM no gpu device available
+THCudaCheck FAIL file=torch/csrc/cuda/Module.cpp line=88 error=35 : CUDA driver version is insufficient for CUDA runtime version
+Traceback (most recent call last):
+  File "train_search.py", line 194, in <module>
+    main() 
+  File "train_search.py", line 67, in main
+    torch.cuda.set_device(args.gpu)
+  File "/public/data1/users/limingming65/.conda/envs/torch/lib/python3.6/site-packages/torch/cuda/__init__.py", line 244, in set_device
+    torch._C._cuda_setDevice(device)
+RuntimeError: cuda runtime error (35) : CUDA driver version is insufficient for CUDA runtime version at torch/csrc/cuda/Module.cpp:88
+salloc: Relinquishing job allocation 67934

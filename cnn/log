@@ -1,0 +1,12 @@
+salloc: Pending job allocation 67699
+salloc: job 67699 queued and waiting for resources
+salloc: job 67699 has been allocated resources
+salloc: Granted job allocation 67699
+salloc: Waiting for resource configuration
+salloc: Nodes gpu-11-71-1-149 are ready for job
+  File "train_search.py", line 148
+    target_search = Variable(target_search, requires_grad=False).(async=True)
+                                                                 ^
+SyntaxError: invalid syntax
+salloc: Relinquishing job allocation 67699
+srun: job 67978 queued and waiting for resources
