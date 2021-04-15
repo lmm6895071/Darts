@@ -15,6 +15,7 @@ class Weights_Update(object):
     self.model = model
     self.optimizer = torch.optim.Adam(self.model.parameters(),
         lr=args.learning_rate, betas=(0.5, 0.999), weight_decay=args.weight_decay)
+    self.args =args
 
   def _compute_unrolled_model(self, input, target, eta, arch_optimizer):
     # alpha = alpha - eta* Dtheta_{alpha}(train datasets)
@@ -34,7 +35,7 @@ class Weights_Update(object):
         self._backward_step_unrolled(input_train, target_train, input_valid, target_valid, eta, arch_optimizer)
     else:
         self._backward_step(input_valid, target_valid)
-    nn.utils.clip_grad_norm(self.model.parameters(), args.grad_clip)
+    nn.utils.clip_grad_norm(self.model.parameters(), self.args.grad_clip)
     self.optimizer.step()
 
   def _backward_step(self, input_valid, target_valid):
