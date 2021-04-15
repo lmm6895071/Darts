@@ -135,7 +135,7 @@ def main():
     utils.save(model, os.path.join(args.save, 'weights.pt'))
 
 
-def train(train_queue, valid_queue, model, architect, criterion, optimizer, lr,weightsupdate):
+def train(train_queue, valid_queue, model, architect, criterion, optimizer_alpha, lr,weightsupdate):
   objs = utils.AvgrageMeter()
   top1 = utils.AvgrageMeter()
   top5 = utils.AvgrageMeter()
