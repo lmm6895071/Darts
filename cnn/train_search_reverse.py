@@ -85,7 +85,7 @@ def main():
   #     weight_decay=args.weight_decay)
 
   optimizer_alpha = torch.optim.SGD(
-      self.model.arch_parameters(),
+      model.arch_parameters(),
       args.arch_learning_rate, 
       momentum=args.momentum,
       weight_decay=args.arch_weight_decay)
