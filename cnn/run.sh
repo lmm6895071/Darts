@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# SBATCH -A test
+#SBATCH -A test
 #SBATCH -J lmm
 # SBATCH -N 1
 #SBATCH --ntasks-per-node=1
