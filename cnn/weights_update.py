@@ -74,12 +74,15 @@ class Weights_Update(object):
     #   params[k] = theta[offset: offset+v_length].view(v.size())
     #   offset += v_length
 
-    for indx,item in enumerate(self.model.arch_parameters()):
-      v_length = np.prod(item.size())
-      model_new.arch_parameters[indx]=theta[offset:offset+v_length].view(item.size)
-      offset += v_length
-
+     
+    v_length = np.prod(self.model.alphas_normal.view(-1).size())
+    model_new.alphas_normal = theta[offset:offset+v_length].view(v_length).copy()
+    offset += v_length
+    
+    v_length = np.prod(self.model.alphas_reduce.view(-1).size())
+    model_new.alphas_reduce = theta[offset:offset+v_length].view(v_length).copy()
     assert offset == len(theta)
+    model_new._arch_parameters=[model_new.alphas_normal,model_new.alphas_reduce]
     # model_dict.update(params)
     # model_new.load_state_dict(model_dict)
     return model_new.cuda()
