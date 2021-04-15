@@ -44,7 +44,7 @@ parser.add_argument('--arch_weight_decay', type=float, default=1e-3, help='weigh
 args = parser.parse_args()
 
 args.save = 'search-{}-{}'.format(args.save, time.strftime("%Y%m%d-%H%M%S"))
-utils.create_exp_dir(args.save, scripts_to_save=glob.glob('*.py'))
+#utils.create_exp_dir(args.save, scripts_to_save=glob.glob('*.py'))
 
 log_format = '%(asctime)s %(message)s'
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
@@ -61,19 +61,16 @@ CIFAR_CLASSES = 10
 def main():
   if not torch.cuda.is_available():
     logging.info('no gpu device available')
-    # sys.exit(1)
+    sys.exit(1)
 
   np.random.seed(args.seed)
   torch.manual_seed(args.seed)
-  try:
-    torch.cuda.set_device(args.gpu)
-    cudnn.benchmark = True
-    cudnn.enabled=True
-    torch.cuda.manual_seed(args.seed)
-    logging.info('gpu device = %d' % args.gpu)
-    logging.info("args = %s", args)
-  except Exception as e:
-    logging.info("cpu")
+  torch.cuda.set_device(args.gpu)
+  cudnn.benchmark = True
+  cudnn.enabled=True
+  torch.cuda.manual_seed(args.seed)
+  logging.info('gpu device = %d' % args.gpu)
+  logging.info("args = %s", args)
 
   criterion = nn.CrossEntropyLoss()
   criterion = criterion.cuda()

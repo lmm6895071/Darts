@@ -43,7 +43,7 @@ parser.add_argument('--arch_weight_decay', type=float, default=1e-3, help='weigh
 args = parser.parse_args()
 
 args.save = 'search-{}-{}'.format(args.save, time.strftime("%Y%m%d-%H%M%S"))
-utils.create_exp_dir(args.save, scripts_to_save=glob.glob('*.py'))
+#utils.create_exp_dir(args.save, scripts_to_save=glob.glob('*.py'))
 
 log_format = '%(asctime)s %(message)s'
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
@@ -60,19 +60,15 @@ CIFAR_CLASSES = 10
 def main():
   if not torch.cuda.is_available():
     logging.info('no gpu device available')
-    # sys.exit(1)
+    sys.exit(1)
 
   np.random.seed(args.seed)
-  torch.manual_seed(args.seed)
-  try:
-    torch.cuda.set_device(args.gpu)
-    cudnn.benchmark = True
-    cudnn.enabled=True
-    torch.cuda.manual_seed(args.seed)
-    logging.info('gpu device = %d' % args.gpu)
-    logging.info("args = %s", args)
-  except Exception as e:
-    print("no gpu, only cuda")
+  torch.cuda.set_device(args.gpu)
+  cudnn.benchmark = True
+  cudnn.enabled=True
+  torch.cuda.manual_seed(args.seed)
+  logging.info('gpu device = %d' % args.gpu)
+  logging.info("args = %s", args)
   criterion = nn.CrossEntropyLoss()
   criterion = criterion.cuda()
   model = Network(args.init_channels, CIFAR_CLASSES, args.layers, criterion)
@@ -145,7 +141,7 @@ def train(train_queue, valid_queue, model, architect, criterion, optimizer, lr):
     # get a random minibatch from the search queue with replacement
     input_search, target_search = next(iter(valid_queue))
     input_search = Variable(input_search, requires_grad=False).cuda()#()
-    target_search = Variable(target_search, requires_grad=False).(async=True)
+    target_search = Variable(target_search, requires_grad=False).cuda(async=True)
 
     architect.step(input, target, input_search, target_search, lr, optimizer, unrolled=args.unrolled)
 
