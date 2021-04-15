@@ -66,17 +66,22 @@ class Weights_Update(object):
 
   def _construct_model_from_theta(self, theta):
     model_new = self.model.new()
-    model_dict = self.model.state_dict()
+    # model_dict = self.model.state_dict()
 
     params, offset = {}, 0
-    for k, v in self.model.named_parameters():
-      v_length = np.prod(v.size())
-      params[k] = theta[offset: offset+v_length].view(v.size())
+    # for k, v in self.model.named_parameters():
+    #   v_length = np.prod(v.size())
+    #   params[k] = theta[offset: offset+v_length].view(v.size())
+    #   offset += v_length
+
+    for indx,item in enumerate(self.model.arch_parameters()):
+      v_length = np.prod(item.size())
+      model_new.arch_parameters[indx]=theta[offset:offset+v_length].view(item.size)
       offset += v_length
 
     assert offset == len(theta)
-    model_dict.update(params)
-    model_new.load_state_dict(model_dict)
+    # model_dict.update(params)
+    # model_new.load_state_dict(model_dict)
     return model_new.cuda()
 
   def _hessian_vector_product(self, vector, input, target, r=1e-2):
