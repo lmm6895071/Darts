@@ -10,3 +10,6 @@ salloc: Nodes gpu-11-71-1-149 are ready for job
 SyntaxError: invalid syntax
 salloc: Relinquishing job allocation 67699
 srun: job 67978 queued and waiting for resources
+srun: job 67978 has been allocated resources
+04/15 10:20:38 AM gpu device = 0
+04/15 10:20:38 AM args = Namespace(arch_learning_rate=0.0003, arch_weight_decay=0.001, batch_size=64, cutout=False, cutout_length=16, data='../data', drop_path_prob=0.3, epochs=50, gpu=0, grad_clip=5, init_channels=16, layers=8, learning_rate=0.025, learning_rate_min=0.001, model_path='saved_models', momentum=0.9, report_freq=50, save='search-EXP-20210415-102037', seed=2, train_portion=0.5, unrolled=False, weight_decay=0.0003)
