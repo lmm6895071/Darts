@@ -42,7 +42,8 @@ parser.add_argument('--arch_learning_rate', type=float, default=3e-4, help='lear
 parser.add_argument('--arch_weight_decay', type=float, default=1e-3, help='weight decay for arch encoding')
 args = parser.parse_args()
 
-args.save = 'search-{}-{}'.format(args.save, time.strftime("%Y%-%H%m%dM%S"))
+_unrolled = "unrolled" if args.unrolled else ""
+args.save = 'search-{}-{}-{}'.format(args.save,_unrolled, time.strftime("%Y%-%H%m%dM%S"))
 # args.save = 'search-{}-{}'.format(args.save, time.strftime("%Y%-%H%m%dM%S"))
 utils.create_exp_dir(args.save, scripts_to_save=glob.glob('*.py'))
 
