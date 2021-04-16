@@ -76,11 +76,13 @@ class Weights_Update(object):
 
      
     v_length = np.prod(self.model.alphas_normal.view(-1).size())
-    model_new.alphas_normal.data = theta[offset:offset+v_length].view(v_length).copy()
+    v_size = self.model.alphas_normal.size()
+    model_new.alphas_normal.data = theta[offset:offset+v_length].view(v_size)
     offset += v_length
     
     v_length = np.prod(self.model.alphas_reduce.view(-1).size())
-    model_new.alphas_reduce.data = theta[offset:offset+v_length].view(v_length).copy()
+    v_size = self.model.alphas_reduce.size()
+    model_new.alphas_reduce.data = theta[offset:offset+v_length].view(v_size)
     assert offset == len(theta)
     model_new._arch_parameters=[model_new.alphas_normal,model_new.alphas_reduce]
     # model_dict.update(params)
