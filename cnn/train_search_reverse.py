@@ -44,7 +44,7 @@ parser.add_argument('--arch_weight_decay', type=float, default=1e-3, help='weigh
 args = parser.parse_args()
 
 _unrolled = "unrolled" if args.unrolled else ""
-args.save = 'search-reverse-{}-{}-{}'.format(args.save, _unrolled,time.strftime("%Y%m%d-%H%M%S"))
+args.save = 'search-reverse{}-{}-{}'.format(args.save, _unrolled,time.strftime("%Y%m%d-%H%M%S"))
 utils.create_exp_dir(args.save, scripts_to_save=glob.glob('*.py'))
 
 log_format = '%(asctime)s %(message)s'
