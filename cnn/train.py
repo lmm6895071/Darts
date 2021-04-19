@@ -49,33 +49,31 @@ logging.getLogger().addHandler(fh)
 
 CIFAR_CLASSES = 10
 
-DEVICE ="cpu"# torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+DEVICE ="cuda"# torch.device("cuda:0" if torch.cuda.is_available() else "cuda")
 
 def main():
   if not torch.cuda.is_available():
     logging.info('no gpu device available')
-    # sys.exit(1)
+    sys.exit(1)
 
   np.random.seed(args.seed)
   torch.manual_seed(args.seed)
-  try:
-    torch.cuda.set_device(args.gpu)
-    cudnn.benchmark = True
-    cudnn.enabled=True
-    torch.cuda.manual_seed(args.seed)
-    logging.info('gpu device = %d' % args.gpu)
-    logging.info("args = %s", args)
-  except Exception as e:
-    logging.info("cpu")
-  
+
+  torch.cuda.set_device(args.gpu)
+  cudnn.benchmark = True
+  cudnn.enabled=True
+  torch.cuda.manual_seed(args.seed)
+  logging.info('gpu device = %d' % args.gpu)
+  logging.info("args = %s", args)
+
   genotype = eval("genotypes.%s" % args.arch)
   model = Network(args.init_channels, CIFAR_CLASSES, args.layers, args.auxiliary, genotype)
-  model = model.cpu()
+  model = model.cuda()
 
   logging.info("param size = %fMB", utils.count_parameters_in_MB(model))
 
   criterion = nn.CrossEntropyLoss()
-  criterion = criterion.cpu()
+  criterion = criterion.cuda()
   optimizer = torch.optim.SGD(
       model.parameters(),
       args.learning_rate,
@@ -116,8 +114,8 @@ def train(train_queue, model, criterion, optimizer):
   model.train()
 
   for step, (input, target) in enumerate(train_queue):
-    input = Variable(input).cpu()
-    target = Variable(target).cpu()#cuda(async=True)
+    input = Variable(input).cuda()
+    target = Variable(target).cuda(async=True)
 
     optimizer.zero_grad()
     logits, logits_aux = model(input)
@@ -148,8 +146,8 @@ def infer(valid_queue, model, criterion):
   model.eval()
 
   for step, (input, target) in enumerate(valid_queue):
-    input = Variable(input, volatile=True).cpu()
-    target = Variable(target, volatile=True).cpu()#cuda(async=True)
+    input = Variable(input, volatile=True).cuda()
+    target = Variable(target, volatile=True).cuda(async=True)
 
     logits, _ = model(input)
     loss = criterion(logits, target)
