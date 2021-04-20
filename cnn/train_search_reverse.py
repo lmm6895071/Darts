@@ -159,7 +159,6 @@ def train(train_queue, valid_queue, model, architect, criterion, optimizer_alpha
     loss = criterion(logits, target)
     loss.backward()
     optimizer_alpha.step()
-
     prec1, prec5 = utils.accuracy(logits, target, topk=(1, 5))
     objs.update(loss.data[0], n)
     top1.update(prec1.data[0], n)
